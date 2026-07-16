@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Contest {
-    public String id;
+    public int id;
     public ContestTypeEnum type;
 }

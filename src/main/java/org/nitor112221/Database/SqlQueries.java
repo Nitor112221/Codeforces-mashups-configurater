@@ -1,7 +1,7 @@
 package org.nitor112221.Database;
 
 public class SqlQueries {
-
+    // ------------------------------------!!! CREATE TABLES !!!-----------------------------------
     protected static final String CREATE_CONTESTS =
             "CREATE TABLE IF NOT EXISTS contests (" +
                     "    id INTEGER PRIMARY KEY," +
@@ -38,4 +38,19 @@ public class SqlQueries {
             "CREATE INDEX IF NOT EXISTS idx_problems_contest ON problems(contest_id);" +
                     "CREATE INDEX IF NOT EXISTS idx_problem_tags_tag ON problem_tags(tag_id);" +
                     "CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name);";
+
+    // ------------------------------------!!! INSERT DATA !!!-----------------------------------
+    protected static final String INSERT_PROBLEM =
+            "INSERT INTO problems (contest_id, problem_index, name, rating) VALUES (?, ?, ?, ?)";
+
+    protected static final String INSERT_CONTEST =
+            "INSERT INTO contests (id, type) VALUES (?, ?)";
+
+    protected static final String INSERT_TAG =
+            "INSERT INTO tags (name) VALUES (?) ON CONFLICT(name) DO NOTHING";
+
+    protected static final String GET_TAG_ID = "SELECT id FROM tags WHERE name = ?";
+
+    protected static final String LING_TAG =
+            "INSERT INTO problem_tags (contest_id, problem_index, tag_id) VALUES (?, ?, ?)";
 }
