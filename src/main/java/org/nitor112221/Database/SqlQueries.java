@@ -13,7 +13,7 @@ public class SqlQueries {
                     "    contest_id INTEGER NOT NULL," +
                     "    problem_index TEXT NOT NULL," +
                     "    name TEXT NOT NULL," +
-                    "    type TEXT NOT NULL CHECK (type IN ('PROGRAMMING', 'QUESTION'))," +
+                    "    rating INTEGER NOT NULL," +
                     "    PRIMARY KEY (contest_id, problem_index)," +
                     "    FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE" +
                     ");";
@@ -51,6 +51,11 @@ public class SqlQueries {
 
     protected static final String GET_TAG_ID = "SELECT id FROM tags WHERE name = ?";
 
-    protected static final String LING_TAG =
+    protected static final String LINK_TAG =
             "INSERT INTO problem_tags (contest_id, problem_index, tag_id) VALUES (?, ?, ?)";
+
+    // ------------------------------------!!! FIND DATA !!!-----------------------------------
+
+    protected static final String FIND_LINKED_TAGS =
+            "SELECT tag_id FROM problem_tags WHERE contest_id = ? AND problem_index = ?";
 }

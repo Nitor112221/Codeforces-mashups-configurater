@@ -51,9 +51,10 @@ public class Database extends SqlQueries {
                     pstmt.setString(1, tag.toString());
                     try (ResultSet rs = pstmt.executeQuery()) {
                         rs.next();
-                        tagId = rs.getInt("id");
+                        tagId = rs.getInt(1);
                     }
                 }
+
                 tag.setId(tagId);
             }
         } catch (SQLException e) {
@@ -68,24 +69,26 @@ public class Database extends SqlQueries {
         conn.setAutoCommit(false);
         try {
             for (Problem problem : problems) {
-                if (problem.rating == null) continue;
+                if (problem.getRating() == null) continue;
                 try (PreparedStatement pstmt = conn.prepareStatement(INSERT_PROBLEM)) {
-                    pstmt.setInt(1, problem.contestId);
-                    pstmt.setString(2, problem.index);
-                    pstmt.setString(3, problem.name);
-                    pstmt.setInt(4, problem.rating);
+                    pstmt.setInt(1, problem.getContestId());
+                    pstmt.setString(2, problem.getIndex());
+                    pstmt.setString(3, problem.getName());
+                    pstmt.setInt(4, problem.getRating());
                     pstmt.executeUpdate();
                 }
-                for (TagEnum tag : problem.tags) {
+
+                for (TagEnum tag : problem.getTags()) {
                     // Связываем задачу с тегом
-                    try (PreparedStatement pstmt = conn.prepareStatement(LING_TAG)) {
-                        pstmt.setInt(1, problem.contestId);
-                        pstmt.setString(2, problem.index);
+                    try (PreparedStatement pstmt = conn.prepareStatement(LINK_TAG)) {
+                        pstmt.setInt(1, problem.getContestId());
+                        pstmt.setString(2, problem.getIndex());
                         pstmt.setInt(3, tag.getId());
                         pstmt.executeUpdate();
                     }
                 }
             }
+
             conn.commit();
 
         } catch (SQLException e) {
@@ -112,6 +115,40 @@ public class Database extends SqlQueries {
         } finally {
             conn.setAutoCommit(true);
         }
+    }
+
+    public static ArrayList<Problem> ExecuteSearch(String query) throws SQLException{
+        ArrayList<Problem> result = new ArrayList<Problem>();
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    result.add(
+                        new Problem(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getInt(4),
+                            GetProblemTags(rs.getInt(1), rs.getString(2))
+                        )
+                    );
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static ArrayList<TagEnum> GetProblemTags(int contestId, String index) throws SQLException{
+        ArrayList<TagEnum> result = new ArrayList<TagEnum>();
+        try (PreparedStatement pstmt = conn.prepareStatement(FIND_LINKED_TAGS)) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    result.add(TagEnum.fromId(rs.getInt(1)));
+                }
+            }
+        }
+
+        return result;
     }
 
     public static void CloseDB() throws SQLException {

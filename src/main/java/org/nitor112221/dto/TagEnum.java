@@ -1,5 +1,9 @@
 package org.nitor112221.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public enum TagEnum {
     TWO_SAT("2-sat", "2-sat"),
     BINARY_SEARCH("binary search", "бинарный поиск"),
@@ -41,17 +45,13 @@ public enum TagEnum {
 
     private final String english;
     private final String russian;
+    @Setter
     private Integer id;
 
     TagEnum(String english, String russian) {
         this.english = english;
         this.russian = russian;
     }
-
-    public String getEnglish() { return english; }
-    public String getRussian() { return russian; }
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
 
     @Override
     public String toString() {
@@ -76,6 +76,18 @@ public enum TagEnum {
         }
         for (TagEnum tag : values()) {
             if (tag.russian.equalsIgnoreCase(russian)) {
+                return tag;
+            }
+        }
+        return null;
+    }
+
+    public static TagEnum fromId(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        for (TagEnum tag : values()) {
+            if (tag.id.equals(id)) {
                 return tag;
             }
         }
