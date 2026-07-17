@@ -13,9 +13,9 @@ public class Problem {
     public String index;
     public String name;
     public Integer rating;
-    public ArrayList<String> tags;
+    public ArrayList<TagEnum> tags;
 
-    Problem(int contestId, String index, String name, ArrayList<String> tags) {
+    Problem(int contestId, String index, String name, ArrayList<TagEnum> tags) {
         this.contestId = contestId;
         this.index = index;
         this.name = name;
