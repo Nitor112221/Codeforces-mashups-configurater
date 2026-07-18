@@ -104,8 +104,8 @@ public class Database extends SqlQueries {
         try {
             for (Contest contest : contests) {
                 try (PreparedStatement pstmt = conn.prepareStatement(INSERT_CONTEST)) {
-                    pstmt.setInt(1, contest.id);
-                    pstmt.setString(1, contest.type.toString());
+                    pstmt.setInt(1, contest.getId());
+                    pstmt.setString(2, contest.getType().toString());
                     pstmt.executeUpdate();
                 }
             }
@@ -141,6 +141,8 @@ public class Database extends SqlQueries {
     public static ArrayList<TagEnum> GetProblemTags(int contestId, String index) throws SQLException{
         ArrayList<TagEnum> result = new ArrayList<TagEnum>();
         try (PreparedStatement pstmt = conn.prepareStatement(FIND_LINKED_TAGS)) {
+            pstmt.setInt(1, contestId);
+            pstmt.setString(2, index);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     result.add(TagEnum.fromId(rs.getInt(1)));

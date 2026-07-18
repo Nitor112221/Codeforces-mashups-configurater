@@ -87,7 +87,7 @@ public enum TagEnum {
             return null;
         }
         for (TagEnum tag : values()) {
-            if (tag.id.equals(id)) {
+            if (tag.id != null && tag.id.equals(id)) {
                 return tag;
             }
         }

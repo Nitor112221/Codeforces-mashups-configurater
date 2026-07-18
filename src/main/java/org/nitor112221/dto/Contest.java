@@ -2,10 +2,11 @@ package org.nitor112221.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class Contest {
-    public int id;
-    public ContestTypeEnum type;
+    private int id;
+    private ContestTypeEnum type;
 }

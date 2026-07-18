@@ -47,7 +47,7 @@ public class SqlQueries {
             "INSERT INTO contests (id, type) VALUES (?, ?)";
 
     protected static final String INSERT_TAG =
-            "INSERT INTO tags (name) VALUES (?) ON CONFLICT(name) DO NOTHING";
+            "INSERT INTO tags (name) VALUES (?)";
 
     protected static final String GET_TAG_ID = "SELECT id FROM tags WHERE name = ?";
 
