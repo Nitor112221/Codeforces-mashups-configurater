@@ -13,11 +13,11 @@ public class FilterProblemWithRatingFromXToY implements FilterProblemInterface{
             return null;
         }
         if (X != null && Y != null) {
-            return "rating >= " + X + " AND rating <= " + Y;
+            return "p.rating BETWEEN " + X + " AND " + Y;
         }
         if (X == null) {
-            return "rating <= " + Y;
+            return "p.rating <= " + Y;
         }
-        return "rating >= " + X;
+        return "p.rating >= " + X;
     }
 }

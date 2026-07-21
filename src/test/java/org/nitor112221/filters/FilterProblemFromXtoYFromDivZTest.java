@@ -13,31 +13,31 @@ class FilterProblemFromXtoYFromDivZTest {
         filter.setY("D");
         filter.setDiv(ContestTypeEnum.DIV2);
         String sql = filter.toSQL();
-        assertTrue(sql.contains("problem_index >= 'A'"));
-        assertTrue(sql.contains("problem_index < 'E'")); // D → < E
-        assertTrue(sql.contains("contests.type = 'Div. 2'"));
-        assertTrue(sql.contains(" && "));
+        assertTrue(sql.contains("p.problem_index >= 'A'"));
+        assertTrue(sql.contains("p.problem_index < 'E'")); // D → < E
+        assertTrue(sql.contains("c.type = 'Div. 2'"));
+        assertTrue(sql.contains(" AND "));
     }
 
     @Test
     void toSQL_withOnlyX_shouldReturnGreaterOrEqual() {
         FilterProblemFromXtoYFromDivZ filter = new FilterProblemFromXtoYFromDivZ();
         filter.setX("C");
-        assertEquals("problem_index >= 'C'", filter.toSQL());
+        assertEquals("p.problem_index >= 'C'", filter.toSQL());
     }
 
     @Test
     void toSQL_withOnlyYLetter_shouldReturnLessThanNext() {
         FilterProblemFromXtoYFromDivZ filter = new FilterProblemFromXtoYFromDivZ();
         filter.setY("D");
-        assertEquals("problem_index < 'E'", filter.toSQL());
+        assertEquals("p.problem_index < 'E'", filter.toSQL());
     }
 
     @Test
     void toSQL_withOnlyYWithDigit_shouldReturnLessOrEqual() {
         FilterProblemFromXtoYFromDivZ filter = new FilterProblemFromXtoYFromDivZ();
         filter.setY("D1");
-        assertEquals("problem_index <= 'D1'", filter.toSQL());
+        assertEquals("p.problem_index <= 'D1'", filter.toSQL());
     }
 
     @Test
@@ -46,7 +46,7 @@ class FilterProblemFromXtoYFromDivZTest {
         filter.setX("B");
         filter.setY("E");
         String sql = filter.toSQL();
-        assertEquals("problem_index >= 'B' && problem_index < 'F'", sql);
+        assertEquals("p.problem_index >= 'B' AND p.problem_index < 'F'", sql);
     }
 
     @Test
@@ -54,14 +54,14 @@ class FilterProblemFromXtoYFromDivZTest {
         FilterProblemFromXtoYFromDivZ filter = new FilterProblemFromXtoYFromDivZ();
         filter.setX("D1");
         filter.setY("D3");
-        assertEquals("problem_index >= 'D1' && problem_index <= 'D3'", filter.toSQL());
+        assertEquals("p.problem_index >= 'D1' AND p.problem_index <= 'D3'", filter.toSQL());
     }
 
     @Test
     void toSQL_withOnlyDiv_shouldReturnDivCondition() {
         FilterProblemFromXtoYFromDivZ filter = new FilterProblemFromXtoYFromDivZ();
         filter.setDiv(ContestTypeEnum.DIV1);
-        assertEquals("contests.type = 'Div. 1'", filter.toSQL());
+        assertEquals("c.type = 'Div. 1'", filter.toSQL());
     }
 
     @Test
@@ -74,7 +74,7 @@ class FilterProblemFromXtoYFromDivZTest {
     void buildUpperBoundCondition_withZ_shouldReturnNextChar() {
         FilterProblemFromXtoYFromDivZ filter = new FilterProblemFromXtoYFromDivZ();
         filter.setY("Z");
-        assertEquals("problem_index < '['", filter.toSQL());
+        assertEquals("p.problem_index < '['", filter.toSQL());
     }
 
     @Test

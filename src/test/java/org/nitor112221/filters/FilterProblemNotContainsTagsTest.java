@@ -27,7 +27,7 @@ class FilterProblemNotContainsTagsTest {
     @Test
     void toSQL_withSingleTag_shouldReturnNotEquals() {
         filter.add(TagEnum.DP);
-        assertEquals("NOT (tag.id = " + TagEnum.DP.getId() + ")", filter.toSQL());
+        assertEquals("NOT (pt.tag_id = " + TagEnum.DP.getId() + ")", filter.toSQL());
     }
 
     @Test
@@ -35,7 +35,7 @@ class FilterProblemNotContainsTagsTest {
         filter.add(TagEnum.DP);
         filter.add(TagEnum.STRINGS);
         String sql = filter.toSQL();
-        assertTrue(sql.startsWith("NOT (tag.id IN ("));
+        assertTrue(sql.startsWith("NOT (pt.tag_id IN ("));
         assertTrue(sql.contains(TagEnum.DP.getId().toString()));
         assertTrue(sql.contains(TagEnum.STRINGS.getId().toString()));
         assertTrue(sql.endsWith("))"));

@@ -10,7 +10,7 @@ class FilterProblemWithRatingFromXToYTest {
         FilterProblemWithRatingFromXToY filter = new FilterProblemWithRatingFromXToY();
         filter.setX(1500);
         filter.setY(2000);
-        assertEquals("rating >= 1500 AND rating <= 2000", filter.toSQL());
+        assertEquals("p.rating BETWEEN 1500 AND 2000", filter.toSQL());
     }
 
     @Test
@@ -18,7 +18,7 @@ class FilterProblemWithRatingFromXToYTest {
         FilterProblemWithRatingFromXToY filter = new FilterProblemWithRatingFromXToY();
         filter.setX(1500);
         assertNull(filter.getY());
-        assertEquals("rating >= 1500", filter.toSQL());
+        assertEquals("p.rating >= 1500", filter.toSQL());
     }
 
     @Test
@@ -26,7 +26,7 @@ class FilterProblemWithRatingFromXToYTest {
         FilterProblemWithRatingFromXToY filter = new FilterProblemWithRatingFromXToY();
         filter.setY(2000);
         assertNull(filter.getX());
-        assertEquals("rating <= 2000", filter.toSQL());
+        assertEquals("p.rating <= 2000", filter.toSQL());
     }
 
     @Test

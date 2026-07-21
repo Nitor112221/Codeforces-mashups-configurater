@@ -34,9 +34,9 @@
 
             if (div != null) {
                 if (hasCondition) {
-                    res.append(" && ");
+                    res.append(" AND ");
                 }
-                res.append("contests.type = '").append(div).append("'");
+                res.append("c.type = '").append(div).append("'");
                 hasCondition = true;
             }
 
@@ -51,10 +51,10 @@
             StringBuilder cond = new StringBuilder();
 
             if (X != null && Y != null) {
-                cond.append("problem_index >= '").append(X).append("' && ");
+                cond.append("p.problem_index >= '").append(X).append("' AND ");
                 cond.append(buildUpperBoundCondition(Y));
             } else if (X != null) {
-                cond.append("problem_index >= '").append(X).append("'");
+                cond.append("p.problem_index >= '").append(X).append("'");
             } else {
                 cond.append(buildUpperBoundCondition(Y));
             }
@@ -69,9 +69,9 @@
 
             if (y.matches("^[A-Z]$")) {
                 char nextChar = (char) (y.charAt(0) + 1);
-                return "problem_index < '" + nextChar + "'";
+                return "p.problem_index < '" + nextChar + "'";
             } else {
-                return "problem_index <= '" + y + "'";
+                return "p.problem_index <= '" + y + "'";
             }
         }
     }

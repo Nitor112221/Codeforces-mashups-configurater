@@ -27,7 +27,7 @@ class FilterProblemContainsTagsTest {
     @Test
     void toSQL_withSingleTag_shouldReturnEquals() {
         filter.add(TagEnum.DP);
-        assertEquals("tag.id = " + TagEnum.DP.getId(), filter.toSQL());
+        assertEquals("pt.tag_id = " + TagEnum.DP.getId(), filter.toSQL());
     }
 
     @Test
@@ -35,7 +35,7 @@ class FilterProblemContainsTagsTest {
         filter.add(TagEnum.DP);
         filter.add(TagEnum.STRINGS);
         String sql = filter.toSQL();
-        assertTrue(sql.startsWith("tag.id IN ("));
+        assertTrue(sql.startsWith("pt.tag_id IN ("));
         assertTrue(sql.contains(TagEnum.DP.getId().toString()));
         assertTrue(sql.contains(TagEnum.STRINGS.getId().toString()));
         assertTrue(sql.endsWith(")"));
@@ -51,13 +51,13 @@ class FilterProblemContainsTagsTest {
         filter.add(TagEnum.DP);
         filter.add(TagEnum.STRINGS);
         filter.remove(TagEnum.DP);
-        assertEquals("tag.id = " + TagEnum.STRINGS.getId(), filter.toSQL());
+        assertEquals("pt.tag_id = " + TagEnum.STRINGS.getId(), filter.toSQL());
     }
 
     @Test
     void removeNonExistentTag_shouldNotAffectFilter() {
         filter.add(TagEnum.DP);
         filter.remove(TagEnum.MATH);
-        assertEquals("tag.id = " + TagEnum.DP.getId(), filter.toSQL());
+        assertEquals("pt.tag_id = " + TagEnum.DP.getId(), filter.toSQL());
     }
 }

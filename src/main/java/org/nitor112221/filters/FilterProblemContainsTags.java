@@ -23,11 +23,11 @@ public class FilterProblemContainsTags implements FilterProblemInterface{
             return null;
         }
         if (tags.size() == 1) {
-            return "tag.id = " + tags.iterator().next().getId();
+            return "pt.tag_id = " + tags.iterator().next().getId();
         }
 
         StringBuilder res = new StringBuilder();
-        res.append("tag.id IN (");
+        res.append("pt.tag_id IN (");
         Iterator<TagEnum> iter = tags.iterator();
         while (iter.hasNext()) {
             res.append(iter.next().getId());
