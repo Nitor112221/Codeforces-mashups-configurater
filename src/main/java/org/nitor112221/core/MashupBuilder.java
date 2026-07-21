@@ -8,7 +8,6 @@ import org.nitor112221.dto.Problem;
 import org.nitor112221.filters.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @Getter
@@ -47,7 +46,7 @@ public class MashupBuilder {
 
     private String toSQL() {
         StringBuilder st = new StringBuilder();
-        st.append("SELECT DISTINCT problems.*" +
+        st.append("SELECT * FROM (SELECT DISTINCT p.*" +
                 "   FROM problems as p" +
                 "   LEFT JOIN contests as c ON p.contest_id = c.id" +
                 "   LEFT JOIN problem_tags as pt ON p.contest_id = pt.contest_id AND p.problem_index = pt.problem_index"
@@ -58,7 +57,7 @@ public class MashupBuilder {
         hasCondition = addCondition(filterProblemFromXtoYFromDivZ, st, hasCondition);
         hasCondition = addCondition(filterProblemWithRatingFromXToY, st, hasCondition);
 
-        st.append(" ORDER BY RAND()").append(" LIMIT ").append(numProblem);
+        st.append(") sub ORDER BY RAND()").append(" LIMIT ").append(numProblem);
         return st.toString();
     }
 

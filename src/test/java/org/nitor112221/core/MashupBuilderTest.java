@@ -91,7 +91,7 @@ class MashupBuilderTest {
         builder.setNumProblem(5);
         String sql = invokeToSQL(builder);
 
-        assertTrue(sql.trim().startsWith("SELECT DISTINCT"));
+        assertTrue(sql.contains("SELECT DISTINCT"));
         assertTrue(sql.contains("FROM problems as p"));
         assertTrue(sql.contains("LEFT JOIN contests as c ON p.contest_id = c.id"));
         assertTrue(sql.contains("LEFT JOIN problem_tags as pt ON p.contest_id = pt.contest_id AND p.problem_index = pt.problem_index"));
@@ -180,7 +180,6 @@ class MashupBuilderTest {
 
     @Test
     void build_shouldExecuteSearchAndReturnMashupWithProblems() throws Exception {
-        // Подготавливаем список проблем, которые вернёт база
         List<Problem> expectedProblems = new ArrayList<>();
         Problem p1 = new Problem(1, "A", "Test1", 1000);
         Problem p2 = new Problem(2, "B", "Test2", 1200);
@@ -208,7 +207,7 @@ class MashupBuilderTest {
     }
 
     @Test
-    void build_whenDatabaseThrowsException_shouldReturnEmptyMashupAndLogError() throws Exception {
+    void build_whenDatabaseThrowsException_shouldReturnEmptyMashupAndLogError() {
         try (MockedStatic<Database> dbMock = mockStatic(Database.class)) {
             dbMock.when(() -> Database.ExecuteSearch(anyString()))
                     .thenThrow(new SQLException("Connection failed"));
