@@ -187,7 +187,7 @@ class MashupBuilderTest {
         expectedProblems.add(p2);
 
         try (MockedStatic<Database> dbMock = mockStatic(Database.class)) {
-            dbMock.when(() -> Database.ExecuteSearch(anyString()))
+            dbMock.when(() -> Database.executeSearch(anyString()))
                     .thenReturn(expectedProblems);
 
             when(filterRating.toSQL()).thenReturn("rating >= 1000");
@@ -197,7 +197,7 @@ class MashupBuilderTest {
             Mashup mashup = builder.build();
 
             String expectedSQL = invokeToSQL(builder);
-            dbMock.verify(() -> Database.ExecuteSearch(expectedSQL), times(1));
+            dbMock.verify(() -> Database.executeSearch(expectedSQL), times(1));
 
             assertNotNull(mashup);
             assertEquals(2, mashup.getProblems().size());
@@ -209,7 +209,7 @@ class MashupBuilderTest {
     @Test
     void build_whenDatabaseThrowsException_shouldReturnEmptyMashupAndLogError() {
         try (MockedStatic<Database> dbMock = mockStatic(Database.class)) {
-            dbMock.when(() -> Database.ExecuteSearch(anyString()))
+            dbMock.when(() -> Database.executeSearch(anyString()))
                     .thenThrow(new SQLException("Connection failed"));
 
             when(filterRating.toSQL()).thenReturn("rating >= 1000");
@@ -221,21 +221,21 @@ class MashupBuilderTest {
             assertNotNull(mashup);
             assertTrue(mashup.getProblems().isEmpty());
 
-            dbMock.verify(() -> Database.ExecuteSearch(anyString()), times(1));
+            dbMock.verify(() -> Database.executeSearch(anyString()), times(1));
         }
     }
 
     @Test
     void build_withNoFilters_shouldCallExecuteSearchWithCorrectSQL() throws Exception {
         try (MockedStatic<Database> dbMock = mockStatic(Database.class)) {
-            dbMock.when(() -> Database.ExecuteSearch(anyString()))
+            dbMock.when(() -> Database.executeSearch(anyString()))
                     .thenReturn(new ArrayList<>());
 
             builder.setNumProblem(10);
             Mashup mashup = builder.build();
 
             String expectedSQL = invokeToSQL(builder);
-            dbMock.verify(() -> Database.ExecuteSearch(expectedSQL), times(1));
+            dbMock.verify(() -> Database.executeSearch(expectedSQL), times(1));
             assertNotNull(mashup);
             assertTrue(mashup.getProblems().isEmpty());
         }

@@ -13,23 +13,23 @@ public class Database extends SqlQueries {
     public static Statement statmt;
     public static ResultSet resSet;
 
-    public static void Conn() throws ClassNotFoundException, SQLException {
+    public static void conn() throws ClassNotFoundException, SQLException {
         conn = null;
         Class.forName("org.h2.Driver");
         conn = DriverManager.getConnection("jdbc:h2:mem:db", "sa", "sa");
-        CreateTables();
-        LoadTags();
+        createTables();
+        loadTags();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                CloseDB();
+                closeDB();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }));
     }
 
-    public static void CreateTables() throws SQLException {
+    public static void createTables() throws SQLException {
         statmt = conn.createStatement();
         statmt.execute(CREATE_CONTESTS);
         statmt.execute(CREATE_PROBLEMS);
@@ -37,7 +37,7 @@ public class Database extends SqlQueries {
         statmt.execute(CREATE_PROBLEM_TAGS);
         statmt.execute(CREATE_INDEXES);
     }
-    public static void LoadTags() throws SQLException {
+    private static void loadTags() throws SQLException {
         conn.setAutoCommit(false);
         try {
             for (TagEnum tag : TagEnum.values()) {
@@ -65,7 +65,7 @@ public class Database extends SqlQueries {
         }
     }
 
-    public static void LoadProblems(ArrayList<Problem> problems) throws SQLException {
+    public static void loadProblems(ArrayList<Problem> problems) throws SQLException {
         conn.setAutoCommit(false);
         try {
             for (Problem problem : problems) {
@@ -99,7 +99,7 @@ public class Database extends SqlQueries {
         }
     }
 
-    public static void LoadContests(ArrayList<Contest> contests) throws SQLException {
+    public static void loadContests(ArrayList<Contest> contests) throws SQLException {
         conn.setAutoCommit(false);
         try {
             for (Contest contest : contests) {
@@ -117,7 +117,7 @@ public class Database extends SqlQueries {
         }
     }
 
-    public static ArrayList<Problem> ExecuteSearch(String query) throws SQLException{
+    public static ArrayList<Problem> executeSearch(String query) throws SQLException{
         ArrayList<Problem> result = new ArrayList<Problem>();
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -128,7 +128,7 @@ public class Database extends SqlQueries {
                             rs.getString(2),
                             rs.getString(3),
                             rs.getInt(4),
-                            GetProblemTags(rs.getInt(1), rs.getString(2))
+                            getProblemTags(rs.getInt(1), rs.getString(2))
                         )
                     );
                 }
@@ -138,7 +138,7 @@ public class Database extends SqlQueries {
         return result;
     }
 
-    public static ArrayList<TagEnum> GetProblemTags(int contestId, String index) throws SQLException{
+    public static ArrayList<TagEnum> getProblemTags(int contestId, String index) throws SQLException{
         ArrayList<TagEnum> result = new ArrayList<TagEnum>();
         try (PreparedStatement pstmt = conn.prepareStatement(FIND_LINKED_TAGS)) {
             pstmt.setInt(1, contestId);
@@ -153,7 +153,7 @@ public class Database extends SqlQueries {
         return result;
     }
 
-    public static void CloseDB() throws SQLException {
+    public static void closeDB() throws SQLException {
         if (resSet != null) resSet.close();
         if (statmt != null) statmt.close();
         if (conn != null) conn.close();

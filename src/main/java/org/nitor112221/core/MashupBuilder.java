@@ -83,7 +83,7 @@ public class MashupBuilder {
     public Mashup build() {
         Mashup mashup = new Mashup();
         try {
-            for (Problem problem : Database.ExecuteSearch(toSQL())) {
+            for (Problem problem : Database.executeSearch(toSQL())) {
                 mashup.add(problem);
             }
         } catch (SQLException e) {

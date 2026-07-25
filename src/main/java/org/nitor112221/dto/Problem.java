@@ -1,17 +1,15 @@
 package org.nitor112221.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import java.util.ArrayList;
 
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Problem {
     private int contestId;
     private String index;

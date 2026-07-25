@@ -17,4 +17,12 @@ public enum ContestTypeEnum {
     public String toString() {
         return this.name;
     }
+
+    public static ContestTypeEnum fromContestName(String contestName) {
+        if (contestName.contains("Div. 1 + Div. 2")) return DIV1DIV2;
+        if (contestName.contains("Div. 4")) return DIV4;
+        if (contestName.contains("Div. 3")) return DIV3;
+        if (contestName.contains("Div. 2")) return DIV2;
+        return DIV1;
+    }
 }

@@ -15,8 +15,8 @@ class FilterProblemNotContainsTagsTest {
 
     @BeforeAll
     static void setUpAll() throws SQLException, ClassNotFoundException {
-        Database.Conn();
-        Database.CloseDB();
+        Database.conn();
+        Database.closeDB();
     }
 
     @BeforeEach

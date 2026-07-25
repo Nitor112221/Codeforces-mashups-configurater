@@ -21,19 +21,19 @@ class MashupBuilderIntegrationTest {
 
     @BeforeAll
     void initDb() throws Exception {
-        Database.Conn();
+        Database.conn();
         insertTestData();
     }
 
     @AfterAll
     void closeDb() throws SQLException {
-        Database.CloseDB();
+        Database.closeDB();
     }
 
     private void insertTestData() throws SQLException {
         Contest c1 = new Contest(1, ContestTypeEnum.DIV1);
         Contest c2 = new Contest(2, ContestTypeEnum.DIV2);
-        Database.LoadContests(new ArrayList<>(List.of(c1, c2)));
+        Database.loadContests(new ArrayList<>(List.of(c1, c2)));
 
         List<Problem> problems = List.of(
                 new Problem(1, "A", "Div1 A", 1500),
@@ -44,7 +44,7 @@ class MashupBuilderIntegrationTest {
         for (Problem p : problems) {
             p.setTags(new ArrayList<>());
         }
-        Database.LoadProblems(new ArrayList<>(problems));
+        Database.loadProblems(new ArrayList<>(problems));
     }
 
     @Test

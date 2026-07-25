@@ -21,12 +21,12 @@ class DatabaseTest {
 
     @BeforeEach
     void setUp() throws ClassNotFoundException, SQLException {
-        Database.Conn();
+        Database.conn();
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        Database.CloseDB();
+        Database.closeDB();
     }
 
     @Test
@@ -46,7 +46,7 @@ class DatabaseTest {
         Contest contest = new Contest(2244, ContestTypeEnum.DIV2);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         ArrayList<TagEnum> tags = new ArrayList<>();
         tags.add(TagEnum.DP);
@@ -58,10 +58,10 @@ class DatabaseTest {
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
 
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
         String query = "SELECT * FROM problems WHERE contest_id = 2244 AND problem_index = 'E'";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
 
         assertEquals(1, result.size());
         Problem found = result.getFirst();
@@ -81,7 +81,7 @@ class DatabaseTest {
         Contest contest = new Contest(2244, ContestTypeEnum.DIV2);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         ArrayList<TagEnum> tags = new ArrayList<TagEnum>();
         tags.add(TagEnum.DP);
@@ -93,10 +93,10 @@ class DatabaseTest {
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
 
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
         String query = "SELECT * FROM problems WHERE contest_id = 2244 AND problem_index = 'E'";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
 
         assertEquals(0, result.size());
     }
@@ -106,16 +106,16 @@ class DatabaseTest {
         Contest contest = new Contest(2244, ContestTypeEnum.DIV2);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         Problem problem = new Problem(2244, "E", "Маша и гирлянда", 2000);
         problem.setTags(new ArrayList<>());
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
         String query = "SELECT * FROM problems WHERE problem_index = 'E'";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
 
         assertEquals(1, result.size());
         assertEquals("E", result.getFirst().getIndex());
@@ -124,7 +124,7 @@ class DatabaseTest {
     @Test
     void shouldHandleEmptySearch() throws SQLException {
         String query = "SELECT * FROM problems WHERE problem_index = 'X'";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
 
         assertNotNull(result);
         assertEquals(0, result.size());
@@ -140,7 +140,7 @@ class DatabaseTest {
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
 
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         // Проверяем, что контест появился в таблице contests
         try (Statement stmt = Database.conn.createStatement();
@@ -170,7 +170,7 @@ class DatabaseTest {
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
 
-        assertThrows(SQLException.class, () -> Database.LoadProblems(problems));
+        assertThrows(SQLException.class, () -> Database.loadProblems(problems));
     }
 
     @Test
@@ -178,18 +178,18 @@ class DatabaseTest {
         Contest contest = new Contest(2244, ContestTypeEnum.DIV2);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         Problem problem = new Problem(2244, "E", "Маша и гирлянда", 2000);
         problem.setTags(new ArrayList<>());
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
-        assertThrows(SQLException.class, () -> Database.LoadProblems(problems));
+        assertThrows(SQLException.class, () -> Database.loadProblems(problems));
 
         String query = "SELECT * FROM problems WHERE contest_id = 2244 AND problem_index = 'E'";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
         assertEquals(1, result.size());
     }
 }

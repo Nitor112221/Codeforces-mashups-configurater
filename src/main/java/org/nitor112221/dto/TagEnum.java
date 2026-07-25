@@ -1,5 +1,6 @@
 package org.nitor112221.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,6 +40,7 @@ public enum TagEnum {
     SORTINGS("sortings", "сортировки"),
     STRING_SUFFIX_STRUCTURES("string suffix structures", "суффиксные структуры"),
     STRINGS("strings", "строки"),
+    SPECIAL("*special", "особая"),
     TERNARY_SEARCH("ternary search", "тернарный поиск"),
     TREES("trees", "деревья"),
     TWO_POINTERS("two pointers", "два указателя");
@@ -58,6 +60,7 @@ public enum TagEnum {
         return english;
     }
 
+    @JsonCreator
     public static TagEnum fromEnglish(String english) {
         if (english == null) {
             return null;

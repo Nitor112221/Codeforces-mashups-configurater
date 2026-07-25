@@ -10,8 +10,8 @@ class TagEnumTest {
     @BeforeAll
     static void initTags() throws Exception {
         if (TagEnum.DP.getId() == null) {
-            Database.Conn();
-            Database.CloseDB();
+            Database.conn();
+            Database.closeDB();
         }
     }
 

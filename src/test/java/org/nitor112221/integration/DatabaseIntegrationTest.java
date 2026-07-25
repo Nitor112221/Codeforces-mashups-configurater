@@ -19,12 +19,12 @@ class DatabaseIntegrationTest {
 
     @BeforeAll
     void initDb() throws Exception {
-        Database.Conn();
+        Database.conn();
     }
 
     @AfterAll
     void closeDb() throws SQLException {
-        Database.CloseDB();
+        Database.closeDB();
     }
 
     @BeforeEach
@@ -41,7 +41,7 @@ class DatabaseIntegrationTest {
         Contest contest = new Contest(100, ContestTypeEnum.DIV1);
         ArrayList<Contest> list = new ArrayList<>();
         list.add(contest);
-        Database.LoadContests(list);
+        Database.loadContests(list);
 
         try (Statement stmt = Database.conn.createStatement();
              var rs = stmt.executeQuery("SELECT * FROM contests WHERE id = 100")) {
@@ -56,7 +56,7 @@ class DatabaseIntegrationTest {
         Contest contest = new Contest(2244, ContestTypeEnum.DIV2);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         Problem problem = new Problem(2244, "E", "Маша и гирлянда", 2000);
         List<TagEnum> tags = List.of(TagEnum.DP, TagEnum.STRINGS);
@@ -64,10 +64,10 @@ class DatabaseIntegrationTest {
 
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
         String query = "SELECT * FROM problems WHERE contest_id = 2244";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
         assertEquals(1, result.size());
 
         Problem found = result.getFirst();
@@ -83,16 +83,16 @@ class DatabaseIntegrationTest {
         Contest contest = new Contest(2244, ContestTypeEnum.DIV2);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         Problem problem = new Problem(2244, "E", "Маша и гирлянда", null);
         problem.setTags(new ArrayList<>());
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
         String query = "SELECT * FROM problems WHERE contest_id = 2244";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
         assertEquals(0, result.size());
     }
 
@@ -103,7 +103,7 @@ class DatabaseIntegrationTest {
         ArrayList<Problem> problems = new ArrayList<>();
         problems.add(problem);
 
-        assertThrows(SQLException.class, () -> Database.LoadProblems(problems));
+        assertThrows(SQLException.class, () -> Database.loadProblems(problems));
     }
 
     @Test
@@ -111,7 +111,7 @@ class DatabaseIntegrationTest {
         Contest contest = new Contest(1, ContestTypeEnum.DIV1);
         ArrayList<Contest> contests = new ArrayList<>();
         contests.add(contest);
-        Database.LoadContests(contests);
+        Database.loadContests(contests);
 
         Problem p1 = new Problem(1, "A", "Задача A", 1000);
         p1.setTags(new ArrayList<>(List.of(TagEnum.DP)));
@@ -121,20 +121,20 @@ class DatabaseIntegrationTest {
         p3.setTags(new ArrayList<>(List.of(TagEnum.DP, TagEnum.MATH)));
 
         ArrayList<Problem> problems = new ArrayList<>(List.of(p1, p2, p3));
-        Database.LoadProblems(problems);
+        Database.loadProblems(problems);
 
         String sql = "SELECT DISTINCT p.* FROM problems p " +
                 "JOIN problem_tags pt ON p.contest_id = pt.contest_id AND p.problem_index = pt.problem_index " +
                 "JOIN tags t ON pt.tag_id = t.id " +
                 "WHERE t.name = 'dp'";
-        ArrayList<Problem> result = Database.ExecuteSearch(sql);
+        ArrayList<Problem> result = Database.executeSearch(sql);
         assertEquals(2, result.size());
     }
 
     @Test
     void shouldReturnEmptyListForNonExistentSearch() throws SQLException {
         String query = "SELECT * FROM problems WHERE contest_id = -1";
-        ArrayList<Problem> result = Database.ExecuteSearch(query);
+        ArrayList<Problem> result = Database.executeSearch(query);
         assertNotNull(result);
         assertEquals(0, result.size());
     }
