@@ -47,7 +47,7 @@ public class MainWindow extends MainWindowDesign {
     public void removeFilterBlock(int id) {
         for (int i = 0; i < filterBlocks.size(); i++) {
             if (filterBlocks.get(i).getId() == id) {
-                filterBlocks.remove(id);
+                filterBlocks.remove(i);
                 return;
             }
         }
