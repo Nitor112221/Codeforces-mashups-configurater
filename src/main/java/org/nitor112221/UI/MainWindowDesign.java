@@ -1,5 +1,7 @@
 package org.nitor112221.UI;
 
+import lombok.Getter;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -14,13 +16,11 @@ public abstract class MainWindowDesign extends JFrame {
     protected static final String CARD_MAIN = "MAIN";
 
     protected JPanel mainPanel;
-
-    // Компоненты экрана ошибки
     protected JLabel errorMessageLabel;
 
     // Компоненты основного экрана
-    protected JList<String> mashupList;
-    protected DefaultListModel<String> listModel;
+    protected JList<ProblemDisplayItem> mashupList;
+    protected DefaultListModel<ProblemDisplayItem> listModel;
     protected JPanel filtersContainer;
 
     protected final List<FilterBlock> filterBlocks = new ArrayList<>();
@@ -64,7 +64,6 @@ public abstract class MainWindowDesign extends JFrame {
         errorMessageLabel.setForeground(Color.RED);
         errorPanel.add(errorMessageLabel, BorderLayout.CENTER);
 
-        // Кнопка возврата на главную
         JButton backToMainFromError = new JButton("Вернуться на главную");
         backToMainFromError.addActionListener(e -> onBackFromError());
         JPanel errorButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -78,19 +77,22 @@ public abstract class MainWindowDesign extends JFrame {
         mainInterfacePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         mainInterfacePanel.setBackground(new Color(245, 245, 245));
 
-        // Левая панель: список мэшапов
+        // Левая панель: список задач
         JPanel leftPanel = new JPanel(new BorderLayout(5, 5));
         leftPanel.setBackground(new Color(230, 240, 250));
         leftPanel.setBorder(new TitledBorder("Список мэшапов"));
 
         listModel = new DefaultListModel<>();
         mashupList = new JList<>(listModel);
-        mashupList.setFont(new Font("Dialog", Font.PLAIN, 16));
+        mashupList.setFont(new Font("Dialog", Font.PLAIN, 14));
         mashupList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Кастомный рендерер для отображения задач
+        mashupList.setCellRenderer(new ProblemListRenderer());
+
         JScrollPane listScroll = new JScrollPane(mashupList);
         leftPanel.add(listScroll, BorderLayout.CENTER);
 
-        // Кнопка удаления (обработчик в наследнике)
         JButton deleteButton = new JButton("Удалить выбранный");
         deleteButton.addActionListener(e -> onDeleteSelected());
         leftPanel.add(deleteButton, BorderLayout.SOUTH);
@@ -144,6 +146,7 @@ public abstract class MainWindowDesign extends JFrame {
     protected abstract void onAddFilterBlock();
     protected abstract void onGenerateAll();
 
+    // ---------- Навигация ----------
     public void showInit() {
         CardLayout cl = (CardLayout) mainPanel.getLayout();
         cl.show(mainPanel, CARD_INIT);
@@ -158,5 +161,34 @@ public abstract class MainWindowDesign extends JFrame {
         errorMessageLabel.setText("<html><center>" + message + "</center></html>");
         CardLayout cl = (CardLayout) mainPanel.getLayout();
         cl.show(mainPanel, CARD_ERROR);
+    }
+
+    // ---------- Внутренний класс для отображения задачи ----------
+        public record ProblemDisplayItem(int blockId, String contestId, String index, String name) {
+
+            @Override
+            public String toString() {
+                return contestId + index + ". " + name;
+            }
+
+            // TODO: почему то lombok не хочет нормально работать с этим полем
+            public int getBlockId() {
+                return blockId;
+        }
+    }
+
+    // ---------- Рендерер для списка задач ----------
+    private static class ProblemListRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel) super.getListCellRendererComponent(
+                    list, value, index, isSelected, cellHasFocus);
+
+            if (value instanceof ProblemDisplayItem item) {
+                label.setText("<html>" + item.toString() + "</html>");
+            }
+
+            return label;
+        }
     }
 }

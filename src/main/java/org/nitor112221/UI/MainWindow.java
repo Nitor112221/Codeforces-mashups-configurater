@@ -1,12 +1,8 @@
 package org.nitor112221.UI;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainWindow extends MainWindowDesign {
-
-    private final List<FilterBlock> filterBlocksLocal = new ArrayList<>();
 
     public MainWindow() {
         super();
@@ -39,14 +35,21 @@ public class MainWindow extends MainWindowDesign {
 
     @Override
     protected void onGenerateAll() {
-        // Генерируем мэшапы для всех блоков (заглушка)
         for (FilterBlock block : filterBlocks) {
-            String name = "Мэшап #" + (listModel.getSize() + 1) + " (блок " + block.getId() + ")";
-            listModel.addElement(name);
+            block.generate(false);
         }
         JOptionPane.showMessageDialog(this,
-                "Сгенерировано " + filterBlocks.size() + " мэшапов!",
+                "Все мэшапы перегенерированы!",
                 "Генерация завершена",
                 JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void removeFilterBlock(int id) {
+        for (int i = 0; i < filterBlocks.size(); i++) {
+            if (filterBlocks.get(i).getId() == id) {
+                filterBlocks.remove(id);
+                return;
+            }
+        }
     }
 }
