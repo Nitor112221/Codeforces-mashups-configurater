@@ -16,14 +16,6 @@ public class MainWindow extends MainWindowDesign {
     }
 
     @Override
-    protected void onDeleteSelected() {
-        int idx = mashupList.getSelectedIndex();
-        if (idx != -1) {
-            listModel.remove(idx);
-        }
-    }
-
-    @Override
     protected void onAddFilterBlock() {
         blockCounter++;
         FilterBlock block = new FilterBlock(blockCounter, this, listModel);

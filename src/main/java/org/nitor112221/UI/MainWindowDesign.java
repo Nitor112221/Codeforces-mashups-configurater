@@ -4,8 +4,13 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URISyntaxException;
+import java.io.IOException;
 
 public abstract class MainWindowDesign extends JFrame {
 
@@ -91,10 +96,6 @@ public abstract class MainWindowDesign extends JFrame {
         JScrollPane listScroll = new JScrollPane(mashupList);
         leftPanel.add(listScroll, BorderLayout.CENTER);
 
-        JButton deleteButton = new JButton("Удалить выбранный");
-        deleteButton.addActionListener(e -> onDeleteSelected());
-        leftPanel.add(deleteButton, BorderLayout.SOUTH);
-
         mainInterfacePanel.add(leftPanel, BorderLayout.WEST);
 
         // Правая панель: фильтры
@@ -140,7 +141,6 @@ public abstract class MainWindowDesign extends JFrame {
     }
 
     protected abstract void onBackFromError();
-    protected abstract void onDeleteSelected();
     protected abstract void onAddFilterBlock();
     protected abstract void onGenerateAll();
 
@@ -166,9 +166,10 @@ public abstract class MainWindowDesign extends JFrame {
 
             @Override
             public String toString() {
-                return """
-                        <a href="https://codeforces.com/problemset/problem/%d/%s">%d%s</a> %s
-                        """.formatted(contestId, index, contestId, index, name);
+                return String.format(
+                        "%d%s %s</html>",
+                        contestId, index, name
+                );
             }
 
             // TODO: почему то lombok не хочет нормально работать с этим полем
