@@ -1,7 +1,5 @@
 package org.nitor112221.UI;
 
-import lombok.Getter;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -164,11 +162,13 @@ public abstract class MainWindowDesign extends JFrame {
     }
 
     // ---------- Внутренний класс для отображения задачи ----------
-        public record ProblemDisplayItem(int blockId, String contestId, String index, String name) {
+        public record ProblemDisplayItem(int blockId, int contestId, String index, String name) {
 
             @Override
             public String toString() {
-                return contestId + index + ". " + name;
+                return """
+                        <a href="https://codeforces.com/problemset/problem/%d/%s">%d%s</a> %s
+                        """.formatted(contestId, index, contestId, index, name);
             }
 
             // TODO: почему то lombok не хочет нормально работать с этим полем

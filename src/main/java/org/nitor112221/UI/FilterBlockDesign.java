@@ -53,7 +53,7 @@ public abstract class FilterBlockDesign {
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Блок фильтров #" + id),
+                BorderFactory.createTitledBorder(""),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         panel.setBackground(new Color(240, 248, 255));
@@ -313,6 +313,13 @@ public abstract class FilterBlockDesign {
                 listModel.remove(i);
             }
         }
+        Container parent = panel.getParent();
+        if (parent != null) {
+            parent.remove(panel);
+            parent.revalidate();
+            parent.repaint();
+        }
+
         mainWindow.removeFilterBlock(id);
     }
 

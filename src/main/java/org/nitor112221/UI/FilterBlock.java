@@ -1,10 +1,12 @@
 package org.nitor112221.UI;
 
+import org.nitor112221.core.MashupBuilder;
+
 import javax.swing.*;
 import java.util.*;
 import java.util.List;
 
-public class FilterBlock extends FilterBlockDesign{
+public class FilterBlock extends FilterBlockDesign {
     public FilterBlock(int id, MainWindow main, DefaultListModel<MainWindowDesign.ProblemDisplayItem> listModel) {
         super(id, main, listModel);
     }
@@ -12,18 +14,21 @@ public class FilterBlock extends FilterBlockDesign{
     @Override
     protected void generate(boolean showMessage) {
         int count = (int) problemCountSpinner.getValue();
-
-        // TODO: заменить на MashupBuilder
-        // Сейчас заглушка
         List<MainWindowDesign.ProblemDisplayItem> newProblems = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            String index = String.valueOf((char)('A' + i));
-            newProblems.add(new MainWindowDesign.ProblemDisplayItem(id,
-                    String.valueOf(2244 + id),
-                    index,
-                    "Задача " + index + " (блок #" + id + ")"
-            ));
-        }
+        MashupBuilder mb = new MashupBuilder();
+        mb.setFilter(ratingFilter);
+        mb.setFilter(indexDivFilter);
+        mb.setFilter(containsTagsFilter);
+        mb.setFilter(notContainsTagsFilter);
+        mb.setNumProblem(count);
+
+        newProblems = mb.build()
+                .getProblems()
+                .stream()
+                .map((problem) -> {
+                    return new MainWindowDesign.ProblemDisplayItem(id, problem.getContestId(), problem.getIndex(), problem.getName());
+                })
+                .toList();
 
         // Удаляем все старые задачи этого блока
         for (int i = listModel.getSize() - 1; i >= 0; i--) {
