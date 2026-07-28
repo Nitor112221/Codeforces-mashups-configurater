@@ -3,7 +3,6 @@ package org.nitor112221.UI;
 import org.nitor112221.core.MashupBuilder;
 
 import javax.swing.*;
-import java.util.*;
 import java.util.List;
 
 public class FilterBlock extends FilterBlockDesign {
@@ -14,7 +13,6 @@ public class FilterBlock extends FilterBlockDesign {
     @Override
     protected void generate(boolean showMessage) {
         int count = (int) problemCountSpinner.getValue();
-        List<MainWindowDesign.ProblemDisplayItem> newProblems = new ArrayList<>();
         MashupBuilder mb = new MashupBuilder();
         mb.setFilter(ratingFilter);
         mb.setFilter(indexDivFilter);
@@ -22,12 +20,10 @@ public class FilterBlock extends FilterBlockDesign {
         mb.setFilter(notContainsTagsFilter);
         mb.setNumProblem(count);
 
-        newProblems = mb.build()
+        List<MainWindowDesign.ProblemDisplayItem> newProblems = mb.build()
                 .getProblems()
                 .stream()
-                .map((problem) -> {
-                    return new MainWindowDesign.ProblemDisplayItem(id, problem.getContestId(), problem.getIndex(), problem.getName());
-                })
+                .map((problem) -> new MainWindowDesign.ProblemDisplayItem(id, problem.getContestId(), problem.getIndex(), problem.getName()))
                 .toList();
 
         // Удаляем все старые задачи этого блока

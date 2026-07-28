@@ -8,9 +8,7 @@ import org.nitor112221.filters.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public abstract class FilterBlockDesign {
@@ -131,26 +129,20 @@ public abstract class FilterBlockDesign {
         JTextField yField = new JTextField(5);
         filterPanel.add(yField);
 
-        xField.getDocument().addDocumentListener(new SimpleDocumentListener() {
-            @Override
-            public void update() {
-                String text = xField.getText().trim();
-                if (text.isEmpty()) ratingFilter.setX(null);
-                else {
-                    try { ratingFilter.setX(Integer.parseInt(text)); }
-                    catch (NumberFormatException ignored) { }
-                }
+        xField.getDocument().addDocumentListener((SimpleDocumentListener) () -> {
+            String text = xField.getText().trim();
+            if (text.isEmpty()) ratingFilter.setX(null);
+            else {
+                try { ratingFilter.setX(Integer.parseInt(text)); }
+                catch (NumberFormatException ignored) { }
             }
         });
-        yField.getDocument().addDocumentListener(new SimpleDocumentListener() {
-            @Override
-            public void update() {
-                String text = yField.getText().trim();
-                if (text.isEmpty()) ratingFilter.setY(null);
-                else {
-                    try { ratingFilter.setY(Integer.parseInt(text)); }
-                    catch (NumberFormatException ignored) { }
-                }
+        yField.getDocument().addDocumentListener((SimpleDocumentListener) () -> {
+            String text = yField.getText().trim();
+            if (text.isEmpty()) ratingFilter.setY(null);
+            else {
+                try { ratingFilter.setY(Integer.parseInt(text)); }
+                catch (NumberFormatException ignored) { }
             }
         });
 
@@ -195,19 +187,13 @@ public abstract class FilterBlockDesign {
         });
         filterPanel.add(divCombo);
 
-        xField.getDocument().addDocumentListener(new SimpleDocumentListener() {
-            @Override
-            public void update() {
-                String text = xField.getText().trim();
-                indexDivFilter.setX(text.isEmpty() ? null : text);
-            }
+        xField.getDocument().addDocumentListener((SimpleDocumentListener) () -> {
+            String text = xField.getText().trim();
+            indexDivFilter.setX(text.isEmpty() ? null : text);
         });
-        yField.getDocument().addDocumentListener(new SimpleDocumentListener() {
-            @Override
-            public void update() {
-                String text = yField.getText().trim();
-                indexDivFilter.setY(text.isEmpty() ? null : text);
-            }
+        yField.getDocument().addDocumentListener((SimpleDocumentListener) () -> {
+            String text = yField.getText().trim();
+            indexDivFilter.setY(text.isEmpty() ? null : text);
         });
         divCombo.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {

@@ -4,13 +4,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URISyntaxException;
-import java.io.IOException;
 
 public abstract class MainWindowDesign extends JFrame {
 
@@ -186,7 +181,7 @@ public abstract class MainWindowDesign extends JFrame {
                     list, value, index, isSelected, cellHasFocus);
 
             if (value instanceof ProblemDisplayItem item) {
-                label.setText("<html>" + item.toString() + "</html>");
+                label.setText("<html>" + item + "</html>");
             }
 
             return label;
