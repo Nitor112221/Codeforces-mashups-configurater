@@ -2,9 +2,12 @@ package org.nitor112221.UI;
 
 import lombok.Getter;
 import org.nitor112221.dto.TagEnum;
+import org.nitor112221.dto.ContestTypeEnum;
+import org.nitor112221.filters.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,14 +20,14 @@ public abstract class FilterBlockDesign {
     private JPanel panel;
 
     // Состояние фильтров
-    protected boolean ratingAdded = false;
-    protected boolean indexDivAdded = false;
-    protected boolean containsTagsAdded = false;
-    protected boolean notContainsTagsAdded = false;
+    protected FilterProblemWithRatingFromXToY ratingFilter = null;
+    protected FilterProblemFromXtoYFromDivZ indexDivFilter = null;
+    protected FilterProblemContainsTags containsTagsFilter = null;
+    protected FilterProblemNotContainsTags notContainsTagsFilter = null;
 
     // Хранилище для выбранных тегов
-    private final Set<String> containsTags = new HashSet<>();
-    private final Set<String> notContainsTags = new HashSet<>();
+    private final Set<TagEnum> containsTags = new HashSet<>();
+    private final Set<TagEnum> notContainsTags = new HashSet<>();
 
     // Компоненты для тегов
     private JPanel containsTagsContainer;
@@ -71,19 +74,19 @@ public abstract class FilterBlockDesign {
 
         JButton addRating = new JButton("Рейтинг от X до Y");
         addRating.addActionListener(e -> addRatingFilter());
-        addRating.setEnabled(!ratingAdded);
+        addRating.setEnabled(ratingFilter == null);
 
         JButton addIndexDiv = new JButton("Индекс X-Y из Div Z");
         addIndexDiv.addActionListener(e -> addIndexDivFilter());
-        addIndexDiv.setEnabled(!indexDivAdded);
+        addIndexDiv.setEnabled(indexDivFilter == null);
 
         JButton addContains = new JButton("Содержит теги");
         addContains.addActionListener(e -> addContainsTagsFilter());
-        addContains.setEnabled(!containsTagsAdded);
+        addContains.setEnabled(containsTagsFilter == null);
 
         JButton addNotContains = new JButton("Не содержит теги");
         addNotContains.addActionListener(e -> addNotContainsTagsFilter());
-        addNotContains.setEnabled(!notContainsTagsAdded);
+        addNotContains.setEnabled(notContainsTagsFilter == null);
 
         buttonsPanel.add(addRating);
         buttonsPanel.add(addIndexDiv);
@@ -101,7 +104,7 @@ public abstract class FilterBlockDesign {
         // --- Кнопка генерации ---
         JButton generateButton = new JButton("Сгенерировать мэшап");
         generateButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        generateButton.addActionListener(e -> generateSingleMashup(true));
+        generateButton.addActionListener(e -> generate(true));
         panel.add(generateButton);
 
 
@@ -117,8 +120,8 @@ public abstract class FilterBlockDesign {
     // ==================== Рейтинг ====================
 
     private void addRatingFilter() {
-        if (ratingAdded) return;
-        ratingAdded = true;
+        if (ratingFilter != null) return;
+        ratingFilter = new FilterProblemWithRatingFromXToY();
 
         JPanel filterPanel = createFilterPanel();
         filterPanel.add(new JLabel("Рейтинг от:"));
@@ -128,8 +131,31 @@ public abstract class FilterBlockDesign {
         JTextField yField = new JTextField(5);
         filterPanel.add(yField);
 
+        xField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+            @Override
+            public void update() {
+                String text = xField.getText().trim();
+                if (text.isEmpty()) ratingFilter.setX(null);
+                else {
+                    try { ratingFilter.setX(Integer.parseInt(text)); }
+                    catch (NumberFormatException ignored) { }
+                }
+            }
+        });
+        yField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+            @Override
+            public void update() {
+                String text = yField.getText().trim();
+                if (text.isEmpty()) ratingFilter.setY(null);
+                else {
+                    try { ratingFilter.setY(Integer.parseInt(text)); }
+                    catch (NumberFormatException ignored) { }
+                }
+            }
+        });
+
         addRemoveButton(filterPanel, () -> {
-            ratingAdded = false;
+            ratingFilter = null;
             enableAddButtons();
         });
 
@@ -140,8 +166,8 @@ public abstract class FilterBlockDesign {
     // ==================== Индекс + Div ====================
 
     private void addIndexDivFilter() {
-        if (indexDivAdded) return;
-        indexDivAdded = true;
+        if (indexDivFilter != null) return;
+        indexDivFilter = new FilterProblemFromXtoYFromDivZ();
 
         JPanel filterPanel = createFilterPanel();
         filterPanel.add(new JLabel("Индекс от:"));
@@ -151,12 +177,11 @@ public abstract class FilterBlockDesign {
         JTextField yField = new JTextField(3);
         filterPanel.add(yField);
 
-        // Валидация через InputVerifier
+        // Валидация
         InputVerifier indexVerifier = new InputVerifier() {
             @Override
             public boolean verify(JComponent input) {
-                JTextField field = (JTextField) input;
-                String text = field.getText().trim();
+                String text = ((JTextField) input).getText().trim();
                 if (text.isEmpty()) return true;
                 return text.matches("^[A-Z][1-9]?$");
             }
@@ -164,18 +189,39 @@ public abstract class FilterBlockDesign {
         xField.setInputVerifier(indexVerifier);
         yField.setInputVerifier(indexVerifier);
 
-        // Добавляем подсказку
-        xField.setToolTipText("Одна заглавная буква, опционально с цифрой (например: A, B, D1)");
-        yField.setToolTipText("Одна заглавная буква, опционально с цифрой (например: C, E, D2)");
-
         filterPanel.add(new JLabel("Div:"));
         JComboBox<String> divCombo = new JComboBox<>(new String[]{
                 "Не выбран", "Div. 1", "Div. 2", "Div. 3", "Div. 4", "Div. 1 + Div. 2"
         });
         filterPanel.add(divCombo);
 
+        xField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+            @Override
+            public void update() {
+                String text = xField.getText().trim();
+                indexDivFilter.setX(text.isEmpty() ? null : text);
+            }
+        });
+        yField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+            @Override
+            public void update() {
+                String text = yField.getText().trim();
+                indexDivFilter.setY(text.isEmpty() ? null : text);
+            }
+        });
+        divCombo.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String selected = (String) e.getItem();
+                if ("Не выбран".equals(selected)) {
+                    indexDivFilter.setDiv(null);
+                } else {
+                    indexDivFilter.setDiv(ContestTypeEnum.fromContestName(selected));
+                }
+            }
+        });
+
         addRemoveButton(filterPanel, () -> {
-            indexDivAdded = false;
+            indexDivFilter = null;
             enableAddButtons();
         });
 
@@ -183,46 +229,37 @@ public abstract class FilterBlockDesign {
         enableAddButtons();
     }
 
-    // ==================== Содержит теги (выпадающий список) ====================
+    // ==================== Содержит теги ====================
 
     private void addContainsTagsFilter() {
-        if (containsTagsAdded) return;
-        containsTagsAdded = true;
-
-        JPanel filterPanel = createFilterPanel();
-        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
-        filterPanel.add(new JLabel("Теги (выберите из списка):"));
-
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        topPanel.setOpaque(false);
+        if (containsTagsFilter != null) return;
+        containsTagsFilter = new FilterProblemContainsTags();
 
         containsTagCombo = createTagComboBox(containsTags);
-        topPanel.add(containsTagCombo);
-
-        JButton addTagBtn = new JButton("+");
-        addTagBtn.addActionListener(e -> addContainsTag());
-        topPanel.add(addTagBtn);
-
-        filterPanel.add(topPanel);
 
         containsTagsContainer = new JPanel();
         containsTagsContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         containsTagsContainer.setOpaque(false);
-        filterPanel.add(containsTagsContainer);
 
-        addRemoveButton(filterPanel, () -> {
-            containsTagsAdded = false;
-            containsTags.clear();
-            enableAddButtons();
-        });
+        JPanel filterPanel = createTagFilterPanel(
+                "Теги (выберите из списка):",
+                containsTagCombo,
+                containsTagsContainer,
+                this::addContainsTag,
+                () -> {
+                    containsTagsFilter = null;
+                    containsTags.clear();
+                    enableAddButtons();
+                }
+        );
 
         addToContainer(filterPanel);
         enableAddButtons();
     }
 
     private void addContainsTag() {
-        String selected = (String) containsTagCombo.getSelectedItem();
-        if (selected == null || selected.isEmpty()) return;
+        TagEnum selected = TagEnum.fromEnglish((String) containsTagCombo.getSelectedItem());
+        if (selected == null) return;
         if (containsTags.contains(selected)) return;
 
         containsTags.add(selected);
@@ -233,43 +270,34 @@ public abstract class FilterBlockDesign {
     // ==================== Не содержит теги (выпадающий список) ====================
 
     private void addNotContainsTagsFilter() {
-        if (notContainsTagsAdded) return;
-        notContainsTagsAdded = true;
-
-        JPanel filterPanel = createFilterPanel();
-        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
-        filterPanel.add(new JLabel("Исключить теги (выберите из списка):"));
-
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        topPanel.setOpaque(false);
+        if (notContainsTagsFilter != null) return;
+        notContainsTagsFilter = new FilterProblemNotContainsTags();
 
         notContainsTagCombo = createTagComboBox(notContainsTags);
-        topPanel.add(notContainsTagCombo);
-
-        JButton addTagBtn = new JButton("+");
-        addTagBtn.addActionListener(e -> addNotContainsTag());
-        topPanel.add(addTagBtn);
-
-        filterPanel.add(topPanel);
 
         notContainsTagsContainer = new JPanel();
         notContainsTagsContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         notContainsTagsContainer.setOpaque(false);
-        filterPanel.add(notContainsTagsContainer);
 
-        addRemoveButton(filterPanel, () -> {
-            notContainsTagsAdded = false;
-            notContainsTags.clear();
-            enableAddButtons();
-        });
+        JPanel filterPanel = createTagFilterPanel(
+                "Исключить теги (выберите из списка):",
+                notContainsTagCombo,
+                notContainsTagsContainer,
+                this::addNotContainsTag,
+                () -> {
+                    notContainsTagsFilter = null;
+                    notContainsTags.clear();
+                    enableAddButtons();
+                }
+        );
 
         addToContainer(filterPanel);
         enableAddButtons();
     }
 
     private void addNotContainsTag() {
-        String selected = (String) notContainsTagCombo.getSelectedItem();
-        if (selected == null || selected.isEmpty()) return;
+        TagEnum selected = TagEnum.fromEnglish((String) notContainsTagCombo.getSelectedItem());
+        if (selected == null) return;
         if (notContainsTags.contains(selected)) return;
 
         notContainsTags.add(selected);
@@ -290,16 +318,48 @@ public abstract class FilterBlockDesign {
 
     // ==================== Вспомогательные методы для тегов ====================
 
-    private JComboBox<String> createTagComboBox(Set<String> usedTags) {
-        java.util.List<String> allTags = new ArrayList<>();
-        for (TagEnum tag : TagEnum.values()) {
-            allTags.add(tag.getEnglish());
-        }
+    /**
+     * Создаёт панель для фильтра тегов (содержит комбобокс, кнопку "+" и контейнер для выбранных тегов).
+     *
+     * @param title          заголовок (например, "Теги (выберите из списка):")
+     * @param tagCombo       комбобокс с доступными тегами
+     * @param tagsContainer  панель, куда будут добавляться выбранные теги
+     * @param onAddTag       действие при нажатии кнопки "+" (добавление тега)
+     * @param onRemoveFilter действие при удалении всего фильтра (нажатие крестика)
+     * @return готовая панель JPanel
+     */
+    private JPanel createTagFilterPanel(String title, JComboBox<String> tagCombo,
+                                        JPanel tagsContainer, Runnable onAddTag,
+                                        Runnable onRemoveFilter) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEtchedBorder());
+        panel.setOpaque(false);
 
+        panel.add(new JLabel(title));
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        topPanel.setOpaque(false);
+        topPanel.add(tagCombo);
+
+        JButton addBtn = new JButton("+");
+        addBtn.addActionListener(e -> onAddTag.run());
+        topPanel.add(addBtn);
+
+        panel.add(topPanel);
+
+        panel.add(tagsContainer);
+
+        addRemoveButton(panel, onRemoveFilter);
+
+        return panel;
+    }
+
+    private JComboBox<String> createTagComboBox(Set<TagEnum> usedTags) {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-        for (String tag : allTags) {
+        for (TagEnum tag : TagEnum.values()) {
             if (!usedTags.contains(tag)) {
-                model.addElement(tag);
+                model.addElement(tag.getEnglish());
             }
         }
         if (model.getSize() > 0) {
@@ -311,18 +371,13 @@ public abstract class FilterBlockDesign {
         return combo;
     }
 
-    private void updateTagComboBox(JComboBox<String> combo, Set<String> usedTags) {
+    private void updateTagComboBox(JComboBox<String> combo, Set<TagEnum> usedTags) {
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) combo.getModel();
         model.removeAllElements();
 
-        List<String> allTags = new ArrayList<>();
         for (TagEnum tag : TagEnum.values()) {
-            allTags.add(tag.getEnglish());
-        }
-
-        for (String tag : allTags) {
             if (!usedTags.contains(tag)) {
-                model.addElement(tag);
+                model.addElement(tag.getEnglish());
             }
         }
 
@@ -331,11 +386,11 @@ public abstract class FilterBlockDesign {
         }
     }
 
-    private void addTagToContainer(JPanel container, String tag, Set<String> tagsSet, JComboBox<String> combo) {
+    private void addTagToContainer(JPanel container, TagEnum tag, Set<TagEnum> tagsSet, JComboBox<String> combo) {
         JPanel tagPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
         tagPanel.setOpaque(false);
 
-        JLabel tagLabel = new JLabel(tag);
+        JLabel tagLabel = new JLabel(tag.toString());
         tagLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(100, 150, 200)),
                 BorderFactory.createEmptyBorder(2, 8, 2, 8)
@@ -412,15 +467,23 @@ public abstract class FilterBlockDesign {
                 if (!(btn instanceof JButton b)) continue;
                 String text = b.getText();
                 switch (text) {
-                    case "Рейтинг от X до Y" -> b.setEnabled(!ratingAdded);
-                    case "Индекс X-Y из Div Z" -> b.setEnabled(!indexDivAdded);
-                    case "Содержит теги" -> b.setEnabled(!containsTagsAdded);
-                    case "Не содержит теги" -> b.setEnabled(!notContainsTagsAdded);
+                    case "Рейтинг от X до Y" -> b.setEnabled(ratingFilter == null);
+                    case "Индекс X-Y из Div Z" -> b.setEnabled(indexDivFilter == null);
+                    case "Содержит теги" -> b.setEnabled(containsTagsFilter == null);
+                    case "Не содержит теги" -> b.setEnabled(notContainsTagsFilter == null);
                 }
             }
         }
     }
+    // // ==================== Вспомогательный интерфейс ====================
+
+    private interface SimpleDocumentListener extends javax.swing.event.DocumentListener {
+        void update();
+        @Override default void insertUpdate(javax.swing.event.DocumentEvent e) { update(); }
+        @Override default void removeUpdate(javax.swing.event.DocumentEvent e) { update(); }
+        @Override default void changedUpdate(javax.swing.event.DocumentEvent e) { update(); }
+    }
 
     // ==================== Генерация ====================
-    protected abstract void generateSingleMashup(boolean showMessage);
+    protected abstract void generate(boolean showMessage);
 }

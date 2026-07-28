@@ -9,9 +9,8 @@ public class FilterBlock extends FilterBlockDesign{
         super(id, main, listModel);
     }
 
-    // ==================== Генерация ====================
     @Override
-    protected void generateSingleMashup(boolean showMessage) {
+    protected void generate(boolean showMessage) {
         int count = (int) problemCountSpinner.getValue();
 
         // TODO: заменить на MashupBuilder
@@ -45,9 +44,5 @@ public class FilterBlock extends FilterBlockDesign{
                     "Генерация",
                     JOptionPane.INFORMATION_MESSAGE);
         }
-    }
-
-    public void generate(boolean showMessage) {
-        generateSingleMashup(showMessage);
     }
 }
